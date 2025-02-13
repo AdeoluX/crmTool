@@ -23,9 +23,6 @@ jobs:
       - name: Install Serverless Framework
         run: yarn global add serverless@3
 
-      - name: Upgrade Serverless Framework
-        run: yarn global upgrade serverless
-
       - name: Install AWS SDK
         run: yarn add @aws-sdk/client-cloudformation
 
