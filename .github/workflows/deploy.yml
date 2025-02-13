@@ -3,8 +3,8 @@ name: Deploy to AWS Lambda
 on:
   push:
     branches:
-      - main # Triggers prod deployment
-      - dev # Triggers dev deployment
+      - main
+      - dev
 
 jobs:
   deploy:
@@ -20,15 +20,19 @@ jobs:
           node-version: 18
           cache: "yarn"
 
+      - name: Enforce Node.js 18
+        run: |
+          nvm install 18
+          nvm use 18
+          node -v
+
       - name: Install Serverless Framework
         run: yarn global add serverless@3
 
-      - name: Install AWS SDK
-        run: yarn add @aws-sdk/client-cloudformation
-
       - name: Clean Install Dependencies
         run: |
-          rm -rf node_modules yarn.lock
+          rm -rf node_modules yarn.lock package-lock.json
+          yarn cache clean
           yarn install --frozen-lockfile
 
       - name: Install Serverless plugins
@@ -39,18 +43,14 @@ jobs:
 
       - name: Deploy to AWS Lambda (Dev)
         if: github.ref == 'refs/heads/dev'
-        uses: serverless/github-action@v3
-        with:
-          args: deploy --stage dev
+        run: npx serverless deploy --stage dev
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Deploy to AWS Lambda (Prod)
         if: github.ref == 'refs/heads/main'
-        uses: serverless/github-action@v3
-        with:
-          args: deploy --stage prod
+        run: npx serverless deploy --stage prod
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
