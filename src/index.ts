@@ -1,5 +1,5 @@
 import express, { Express } from "express";
-import { Server as MainServer } from "./setupServer";
+import { Server as  MainServer } from "./setupServer";
 import { config } from "./config";
 import databaseConnection from "./setupDatabase";
 import seeder from "./seeder"
@@ -23,10 +23,10 @@ const server: MainServer = new MainServer(app);
 databaseConnection.connect();
 server.start();
 
-seeder.seedTeam().then((result) => {
-  if(result){
-    seeder.insertFixtures()
-  }
-})
+// seeder.seedTeam().then((result) => {
+//   if(result){
+//     seeder.insertFixtures()
+//   }
+// })
 
 export { app };

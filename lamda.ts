@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Callback, Context } from "aws-lambda";
 import serverless from "@vendia/serverless-express";
-import app from "./src/setupServer"; // Import your Express app
+import app from "./src/lamdaConfig"; // Import your Express app
 
 const server = serverless({ app });//
 

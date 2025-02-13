@@ -13,9 +13,19 @@ import { RedisStore, redisClient } from "./config/redis";
 export class Server {
   private app: Application;
 
-  constructor() {
-    this.app = express();
+  constructor(app: Application) {
+    this.app = app;
     this.setup();
+  }
+
+  public start(): void {
+    this.securityMiddleware(this.app);
+    this.standardMiddleware(this.app);
+    this.redisSessionMiddleware(this.app); // <-- Add Redis session middleware
+    this.routesMiddleware(this.app);
+    this.apiMonitoring(this.app);
+    this.startServer(this.app);
+    this.globalErrorHandler(this.app);
   }
 
   private async setup(): Promise<void> {
@@ -111,9 +121,13 @@ export class Server {
     app.use(errorHandler);
   }
 
+  private startServer(app: Application): void {
+    app.listen(process.env.PORT, async () =>
+      console.log(`Listening on port ${process.env.PORT}`)
+    );
+  }
+
   public getApp(): Application {
     return this.app;
   }
 }
-
-export default new Server().getApp();
