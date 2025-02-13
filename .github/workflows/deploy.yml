@@ -20,8 +20,19 @@ jobs:
           node-version: 18
           cache: "yarn"
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+
+      - name: Upgrade Serverless Framework
+        run: npm update -g serverless
+
+      - name: Install AWS SDK
+        run: npm install @aws-sdk/client-cloudformation
+
+      - name: Clean Install Dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          yarn install --frozen-lockfile
 
       - name: Install Serverless plugins
         run: yarn add -D serverless-plugin-typescript
@@ -29,7 +40,7 @@ jobs:
       - name: Build TypeScript
         run: yarn build
 
-      - name: Install dependencies
+      - name: Install dependencies (Post-Build)
         run: yarn install --frozen-lockfile
 
       - name: Deploy to AWS Lambda (Dev)
