@@ -42,7 +42,7 @@ jobs:
 
       - name: Deploy to AWS Lambda (Dev)
         if: github.ref == 'refs/heads/dev'
-        uses: serverless/github-action@v3
+        uses: serverless/github-action@v4
         with:
           args: deploy --stage dev
         env:
@@ -51,7 +51,7 @@ jobs:
 
       - name: Deploy to AWS Lambda (Prod)
         if: github.ref == 'refs/heads/main'
-        uses: serverless/github-action@v3
+        uses: serverless/github-action@v4
         with:
           args: deploy --stage prod
         env:
