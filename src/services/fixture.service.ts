@@ -5,8 +5,8 @@ import {
   ServiceRes,
 } from "./types/app.types";
 import moment from "moment";
-import { FixtureModel, IFixture } from "../models/fixture.schema";
-import { ILink, LinkModel } from "../models/link.schema";
+import { FixtureModel, IFixture } from "../models/contact.schema";
+import { ILink, LinkModel } from "../models/funnelStatus.schema";
 
 export class FixtureService {
   public async create(payload: ICreateFixture): Promise<ServiceRes> {

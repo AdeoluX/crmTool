@@ -1,7 +1,6 @@
 export interface IsignIn {
   email: string;
   password: string;
-  isAdmin: boolean;
 }
 
 export interface IsignUp {
@@ -9,10 +8,13 @@ export interface IsignUp {
   password: string;
   confirmPassword: string;
   phoneNumber: string;
-  firstName: string;
-  lastName: string;
-  middleName?: string;
-  isAdmin: boolean;
+  companyName: string;
+  plan?: string;
+}
+
+export interface IactivateCompany {
+  activateId: string;
+  password: string
 }
 export interface ServiceRes {
   success: boolean;

@@ -1,15 +1,16 @@
-import session from 'express-session';
-import connectRedis from 'connect-redis';
-import { createClient } from 'redis';
+import { createClient } from "redis";
+import connectRedis from "connect-redis";
+import session from "express-session";
 
-
-console.log('REDIS is ->', process.env.REDIS_URL)
-export const redisClient = createClient({
-  url: process.env.REDIS_URL
+const redisClient = createClient({
+  socket: {
+    host: process.env.REDIS_HOST || "localhost",
+    port: Number(process.env.REDIS_PORT) || 6379,
+  },
 });
 
-// Connect to Redis
-redisClient.connect().catch(console.error);
+redisClient.on("error", (err) => console.error("❌ Redis Client Error", err));
 
-// Initialize Redis store
-export const RedisStore = connectRedis(session);
+const RedisStore = connectRedis(session);
+
+export { RedisStore, redisClient };

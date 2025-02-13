@@ -1,45 +1,43 @@
+import { randomUUID, UUID } from "crypto";
 import { hash, compare } from "bcrypt";
 import { Document, Schema, Types, model } from "mongoose";
 
 
-export interface IUser extends Document {
+export interface ICompany extends Document {
   isValidPassword(password: string): unknown;
-  company: Schema.Types.ObjectId;
-  firstName: string;
-  lastName: string;
-  middleName: string;
-  email?: string;
-  phoneNumber: string;
+  companyName: string;
+  email: string;
   password: string;
-  role: string;
+  phoneNumber: string;
+  currentPlan: Schema.Types.ObjectId;
+  activateId: UUID;
+  activated: boolean;
 }
 
-const UserSchema = new Schema<IUser>(
+const CompanySchema : Schema<ICompany> = new Schema<ICompany>(
   {
-    firstName: {
+    companyName: { 
       type: String,
-      required: true,
     },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    middleName: String,
-    email: String,
     password: {
+      type: String,
+    },
+    email: {
       type: String,
     },
     phoneNumber: {
       type: String,
-      required: true,
     },
-    role: {
-      type: String,
-      enum: ["admin", "marketing", "sales"]
-    },
-    company: {
+    currentPlan: {
       type: Schema.Types.ObjectId,
-      ref: 'Company'
+      ref: 'CompanyPlan',
+    },
+    activateId: {
+      type: String,
+    },
+    activated: {
+      type: Boolean,
+      default: false
     }
   },
   {
@@ -50,7 +48,7 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-UserSchema.method(
+CompanySchema.method(
   "isValidPassword",
   async function (password: string): Promise<boolean> {
     const isValid = await compare(password, this.password);
@@ -58,10 +56,11 @@ UserSchema.method(
   }
 );
 
-UserSchema.pre("save", async function (next) {
+CompanySchema.pre("save", async function (next) {
   const hashedPassword = await hash(this.password, 10);
   this.password = hashedPassword;
   next();
 });
 
-export const UserModel = model<IUser>("User", UserSchema);
+
+export const CompanyModel = model<ICompany>("Company", CompanySchema);

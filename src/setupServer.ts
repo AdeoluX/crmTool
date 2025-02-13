@@ -1,56 +1,51 @@
-import {
-  Application,
-  json,
-  urlencoded,
-  Response,
-  Request,
-  NextFunction,
-} from "express";
+import express, { Application, json, urlencoded, Response, Request, NextFunction, ErrorRequestHandler } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import hpp from "hpp";
 import compression from "compression";
-import Logger from "bunyan";
 import HTTP_STATUS from "http-status-codes";
 import session from "express-session";
-import connectRedis, { Client } from "connect-redis";
-import { createClient } from "redis";
+import rateLimit from "express-rate-limit";
 import applicationRoutes from "./routes";
 import { IErrorResponse, CustomError } from "./utils/error-handler";
 import { RedisStore, redisClient } from "./config/redis";
-import rateLimit from "express-rate-limit";
 
 export class Server {
   private app: Application;
 
-  constructor(app: Application) {
-    this.app = app;
+  constructor() {
+    this.app = express();
+    this.setup();
   }
 
-  public start(): void {
+  private async setup(): Promise<void> {
     this.securityMiddleware(this.app);
     this.standardMiddleware(this.app);
-    this.redisSessionMiddleware(this.app); // <-- Add Redis session middleware
+    await this.redisSessionMiddleware(this.app);
     this.routesMiddleware(this.app);
     this.apiMonitoring(this.app);
-    this.startServer(this.app);
     this.globalErrorHandler(this.app);
   }
 
-  private redisSessionMiddleware(app: Application): void {
-    app.use(
-      session({
-        store: new RedisStore({ client: redisClient as unknown as any }),
-        secret: process.env.SESSION_SECRET || "your_secret_key",
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-          secure: true,
-          httpOnly: true,
-          maxAge: 1000 * 60 * 60 * 24,
-        },
-      })
-    );
+  private async redisSessionMiddleware(app: Application): Promise<void> {
+    try {
+      if (!redisClient.isOpen) await redisClient.connect();
+      app.use(
+        session({
+          store: new RedisStore({ client: redisClient as any }),
+          secret: process.env.SESSION_SECRET || "your_secret_key",
+          resave: false,
+          saveUninitialized: false,
+          cookie: {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 24, // 1 day
+          },
+        })
+      );
+    } catch (error) {
+      console.error("❌ Redis Connection Error:", error);
+    }
   }
 
   private standardMiddleware(app: Application): void {
@@ -61,15 +56,11 @@ export class Server {
   }
 
   private routesMiddleware(app: Application): void {
-    app.use(compression());
-    app.use(json({ limit: "50mb" }));
-    app.use(urlencoded({ extended: true, limit: "50mb" }));
-    app.disable("x-powered-by");
     applicationRoutes(app);
   }
 
   private apiMonitoring(app: Application): void {
-    // You can add your API monitoring logic here
+    // Add API monitoring logic here (e.g., Prometheus, Datadog)
   }
 
   private securityMiddleware(app: Application): void {
@@ -82,48 +73,47 @@ export class Server {
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       })
     );
-    if(process.env.NODE_ENV !== 'test'){
+
+    if (process.env.NODE_ENV !== "test") {
       const limiter = rateLimit({
-        windowMs: 15 * 60 * 1000,
+        windowMs: 15 * 60 * 1000, // 15 minutes
         max: 100,
         message: "Too many requests from this IP, please try again later.",
       });
-  
+
       app.use(limiter);
-      app.set('trust proxy', 1);
+      app.set("trust proxy", 1);
     }
   }
 
   private globalErrorHandler(app: Application): void {
     app.all("*", (req: Request, res: Response) => {
-      res
-        .status(HTTP_STATUS.NOT_FOUND)
-        .json({ message: `${req.originalUrl} not found` });
+      res.status(HTTP_STATUS.NOT_FOUND).json({ message: `${req.originalUrl} not found` });
     });
 
-    app.use(
-      (
-        error: IErrorResponse,
-        _req: Request,
-        res: Response,
-        next: NextFunction
-      ) => {
-        if (error instanceof CustomError) {
-          return res.status(error.statusCode).json(error.serializeErrors());
-        }
-
+    const errorHandler: ErrorRequestHandler = (
+      error: IErrorResponse,
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => {
+      if (error instanceof CustomError) {
+        res.status(error.statusCode).json(error.serializeErrors());
+      } else {
         res.status(HTTP_STATUS.BAD_REQUEST).send({
           status: "BAD_REQUEST",
           message: error.message ?? "Something went wrong.",
           statusCode: HTTP_STATUS.BAD_REQUEST,
         });
       }
-    );
+    };
+
+    app.use(errorHandler);
   }
 
-  private startServer(app: Application): void {
-    app.listen(process.env.PORT, async () =>
-      console.log(`Listening on port ${process.env.PORT}`)
-    );
+  public getApp(): Application {
+    return this.app;
   }
 }
+
+export default new Server().getApp();

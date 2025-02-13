@@ -1,6 +1,6 @@
 import { TeamModel } from "./models/team.schema";
 import teams from '../teams.json'
-import { FixtureModel } from "./models/fixture.schema";
+import { FixtureModel } from "./models/contact.schema";
 import moment from "moment";
 import Utils from "./utils/helper.utils";
 

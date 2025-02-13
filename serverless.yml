@@ -1,0 +1,27 @@
+service: my-express-app
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  timeout: 15
+  memorySize: 1024
+  stage: ${opt:stage, 'dev'} # Default to 'dev' if not specified
+  environment:
+    NODE_ENV: ${self:provider.stage}
+    SESSION_SECRET: ${ssm:/my-app/${self:provider.stage}/session-secret}
+
+functions:
+  api:
+    handler: lambda.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: "{proxy+}"
+          method: ANY
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
