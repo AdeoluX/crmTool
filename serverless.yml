@@ -1,4 +1,4 @@
-service: my-express-app
+service: virenex
 
 provider:
   name: aws

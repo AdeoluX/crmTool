@@ -1,1 +1,0 @@
-{"version":3,"file":"team.routes.js","sourceRoot":"","sources":["../../../src/routes/team.routes.ts"],"names":[],"mappings":";;;;;;AAAA,sDAA0C;AAM1C,MAAM,UAAU;IAGd;QACE,IAAI,CAAC,MAAM,GAAG,iBAAO,CAAC,MAAM,EAAE,CAAC;IACjC,CAAC;IAEM,MAAM;QACX,kJAAkJ;QAClJ,iKAAiK;QACjK,uJAAuJ;QACvJ,mHAAmH;QACnH,OAAO,IAAI,CAAC,MAAM,CAAC;IACrB,CAAC;CACF;AAEY,QAAA,UAAU,GAAe,IAAI,UAAU,EAAE,CAAC"}
