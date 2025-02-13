@@ -20,8 +20,8 @@ jobs:
           node-version: 18
           cache: "yarn"
 
-      - name: Install Serverless Framework
-        run: yarn global add serverless
+      - name: Install Serverless Framework (Older Version)
+        run: yarn add -g serverless@3
 
       - name: Upgrade Serverless Framework
         run: yarn global upgrade serverless
