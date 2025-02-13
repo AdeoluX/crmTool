@@ -17,21 +17,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 18
           cache: "yarn"
 
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: yarn global add serverless
 
       - name: Upgrade Serverless Framework
-        run: npm update -g serverless
+        run: yarn global upgrade serverless
 
       - name: Install AWS SDK
-        run: npm install @aws-sdk/client-cloudformation
+        run: yarn add @aws-sdk/client-cloudformation
 
       - name: Clean Install Dependencies
         run: |
-          rm -rf node_modules package-lock.json
+          rm -rf node_modules yarn.lock
           yarn install --frozen-lockfile
 
       - name: Install Serverless plugins
@@ -39,9 +39,6 @@ jobs:
 
       - name: Build TypeScript
         run: yarn build
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile --legacy-peer-deps
 
       - name: Deploy to AWS Lambda (Dev)
         if: github.ref == 'refs/heads/dev'

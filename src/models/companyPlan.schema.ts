@@ -1,22 +1,24 @@
-import { Document, Schema, model } from "mongoose";
+import mongoose, { Document, Schema, model } from "mongoose";
 
 export interface ICompanyPlan extends Document {
-  company: Schema.Types.ObjectId;
-  plan: Schema.Types.ObjectId;
+  company: mongoose.Types.ObjectId;
+  plan: mongoose.Types.ObjectId;
   isValid: boolean;
   startDate: Date;
   endDate: Date;
 }
 
-const CompanyPlanSchema: Schema<ICompanyPlan> = new Schema<ICompanyPlan>(
+const CompanyPlanSchema = new Schema<ICompanyPlan>(
   {
     company: {
       type: Schema.Types.ObjectId,
       ref: 'Company',
+      required: true,
     },
     plan: {
       type: Schema.Types.ObjectId,
       ref: 'Plan',
+      required: true,
     },
     isValid: {
       type: Boolean,
@@ -32,10 +34,7 @@ const CompanyPlanSchema: Schema<ICompanyPlan> = new Schema<ICompanyPlan>(
     },
   },
   {
-    timestamps: {
-      createdAt: "createdAt",
-      updatedAt: "updatedAt"
-    }
+    timestamps: true
   }
 );
 
