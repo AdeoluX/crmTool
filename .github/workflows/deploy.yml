@@ -23,6 +23,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Install Serverless plugins
+        run: yarn add -D serverless-plugin-typescript
+
+      - name: Build TypeScript
+        run: yarn build
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
       - name: Deploy to AWS Lambda (Dev)
         if: github.ref == 'refs/heads/dev'
         uses: serverless/github-action@v3

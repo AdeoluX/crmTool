@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && copyfiles -u 1 src/**/*.{html,hbs,css,json} build/src/",
+    "build": "tsc",
     "test": "cross-env NODE_ENV=test jest --runInBand  --forceExit",
     "start": "node ./build/src/index.js",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node ./src/index.ts'",
