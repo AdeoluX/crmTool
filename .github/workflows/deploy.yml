@@ -20,11 +20,8 @@ jobs:
           node-version: 18
           cache: "yarn"
 
-      - name: Enforce Node.js 18
-        run: |
-          nvm install 18
-          nvm use 18
-          node -v
+      - name: Verify Node.js Version
+        run: node -v
 
       - name: Install Serverless Framework
         run: yarn global add serverless@3
