@@ -2,7 +2,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, Callback, Context } from "
 import serverless from "@vendia/serverless-express";
 import app from "./src/setupServer"; // Import your Express app
 
-const server = serverless({ app });
+const server = serverless({ app });//
 
 export const handler = async (event: APIGatewayProxyEvent, context: Context, callback: Callback): Promise<APIGatewayProxyResult> => {
   return server(event, context, callback);
